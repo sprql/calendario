@@ -1,0 +1,21 @@
+body { margin: 0; padding: 0 }
+
+@page {
+    size: auto;
+    margin: 0;
+}
+
+rect { fill: #fff; stroke: none; }
+
+.month-name text { fill: #777; }
+
+.day rect { fill: transparent; }
+.day ellipse { fill: #777; }
+.day.day-holyday ellipse { fill: #777; }
+.day text { fill: #333; }
+.day-names ellipse { fill: transparent; }
+.day-names.day-holyday ellipse { fill: transparent; }
+.day.day-holyday text { fill: #c00; }
+.sprint-id text { fill: #ccc; }
+.day-names text { fill: #bbb; }
+.day-names.day-holyday text { fill: #c00; }
