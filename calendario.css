@@ -1,4 +1,4 @@
-body { margin: 0; padding: 0 }
+@import url('https://fonts.googleapis.com/css?family=Ubuntu:300');
 
 @page {
     size: auto;
@@ -7,15 +7,16 @@ body { margin: 0; padding: 0 }
 
 rect { fill: #fff; stroke: none; }
 
-.month-name text { fill: #777; }
+.month-name text { fill: #c00; }
 
-.day rect { fill: transparent; }
-.day ellipse { fill: #777; }
-.day.day-holyday ellipse { fill: #777; }
+.day rect { fill: transparent; stroke: #f0f0f0; }
+.day circle { fill: transparent; }
+.day.day-holyday circle { fill: transparent; }
 .day text { fill: #333; }
-.day-names ellipse { fill: transparent; }
-.day-names.day-holyday ellipse { fill: transparent; }
+.day-names circle { fill: transparent; }
+.day-names rect { stroke: none; }
+.day-names.day-holyday circle { fill: transparent; }
 .day.day-holyday text { fill: #c00; }
 .sprint-id text { fill: #ccc; }
-.day-names text { fill: #bbb; }
+.day-names text { fill: #555; }
 .day-names.day-holyday text { fill: #c00; }
