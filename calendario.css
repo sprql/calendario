@@ -23,3 +23,8 @@ rect {
 .sprint-id text { fill: #ccc; }
 .day-names text { fill: #555; }
 .day-names.day-holyday text { fill: #c00; }
+
+.day.of-prev-month text,
+.day.of-next-month text {
+    fill: #ddd;
+}

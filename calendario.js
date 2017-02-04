@@ -1,4 +1,4 @@
-const alpha = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+const alpha = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'z+'];
 const monthFullNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const dayFullNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const dayShortNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -11,6 +11,8 @@ const h = 297 * k;
 
 const wc = w / 9;
 const baseFontSize = 60 * 2;
+
+const imageURL = 'image.jpg';
 
 
 function $id(id) { return document.getElementById(id); }
@@ -31,19 +33,13 @@ Date.prototype.getWeek = function() {
     return 1 + Math.ceil((firstThursday - target) / (7 * 24 * 3600 * 1000));
 }
 
-function highlightDays(days) {
-    this.days = {}
-    for (var i in days) {
-        this.days[days[i]] = true;
-    }
-}
-
-function cweek(date) {
-    var day = date.getDay();
+Date.prototype.getWeekDay = function() {
+    var day = this.getDay();
     day--;
     if (day == -1) { day = 6 }
     return day;
 }
+
 
 function dayNameCell(text, className) {
     var dv = new SVG.G();
@@ -112,10 +108,6 @@ function sprintIdCell(ctx, date) {
 }
 
 function renderMonth(year, month, highlightDays) {
-    var hlDays = (highlightDays) ? new highlightDays(highlightDays) : null;
-
-    var f = 6;
-
     var table = new SVG.G();
     var yk = 0;
 
@@ -143,50 +135,56 @@ function renderMonth(year, month, highlightDays) {
         daysMatrix.add(dv);
     }
 
-    yk++;
 
-    var weekDay = cweek(new Date(month + '/01/' + year));
+    var date = new Date(month + '/' + 1 + '/' + year);
+    var firstWeekDayOfMonth = date.getWeekDay();
 
-    var date = null;
+    if (firstWeekDayOfMonth > 0) {
+        yk++;
+        var sprintCell = sprintIdCell(daysMatrix, date);
+        sprintCell.move(-wc, wc * yk);
+    }
 
-    for (var d = 0; d < weekDay; d++) {
-        var dv = dayCell(daysMatrix, null, 'day of-prev-month');
+    date.setDate(date.getDate() - firstWeekDayOfMonth);
+    for (var d = 0; d < firstWeekDayOfMonth; d++) {
+        var dv = dayCell(daysMatrix, date.getDate().toString(), 'day of-prev-month');
         dv.move(d * wc, yk * wc);
+        date.setDate(date.getDate() + 1);
     }
 
     for (var d = 1; d < 32; d++) {
-        date = new Date(month + '/' + d + '/' + year);
-        if ((date.getMonth() + 1) > month) {
-            break;
+        weekDay = date.getWeekDay();
+        if (weekDay == 0) {
+            yk++;
+            var sprintCell = sprintIdCell(daysMatrix, date);
+            sprintCell.move(-wc, wc * yk);
         }
-
-        weekDay = cweek(date);
 
         var className = 'day';
         if (weekDay > 4) { className += ' day-holyday'; }
         var dv = dayCell(daysMatrix, d.toString(), className);
         dv.move(wc * weekDay, wc * yk);
 
-        if (weekDay == 6) {
-            var sprintCell = sprintIdCell(daysMatrix, date);
-            sprintCell.move(-wc, wc * yk);
-            yk++;
+        date.setDate(date.getDate() + 1);
+        if ((date.getMonth() + 1) > month) {
+            break;
         }
-    }
-
-    if ((weekDay + 1) < 7) {
-        var sprintCell = sprintIdCell(daysMatrix, date);
-        sprintCell.move(-wc, wc * yk);
     }
 
     for (var d = (weekDay + 1); d < 7; d++) {
         var className = 'day of-next-month';
         if (d > 4) { className += ' day-holyday'; }
-        var dv = dayCell(daysMatrix, null, className);
+        var dv = dayCell(daysMatrix, date.getDate().toString(), className);
         dv.move(wc * d, wc * yk);
+        date.setDate(date.getDate() + 1);
     }
 
-    daysMatrix.move(wc, h - (yk + 1.5) * wc);
+    let tableHeight = (yk + 1.5) * wc;
+    daysMatrix.move(wc, h - tableHeight);
+
+    var image = ctx.image(imageURL, w, h - tableHeight);
+    image.move(0, 0);
+    image.attr({ preserveAspectRatio: 'xMaxYMid slice' });
 
     return table;
 }
@@ -198,10 +196,6 @@ var s = SVG(svg);
 s.viewbox(0, 0, w, h);
 
 var ctx = s.group();
-
-var image = ctx.image('image.jpg', w, 5*wc);
-image.move(0, 0);
-image.attr({ preserveAspectRatio: 'xMaxYMid slice' });
 
 var currentDate = new Date();
 var month = renderMonth(currentDate.getFullYear(), currentDate.getMonth() + 1);
