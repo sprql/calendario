@@ -1,4 +1,17 @@
-var fontFamily = 'Ubuntu';
+const alpha = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+const monthFullNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const dayFullNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const dayShortNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+const fontFamily = 'Ubuntu';
+const k = 10;
+
+const w = 210 * k;
+const h = 297 * k;
+
+const wc = w / 9;
+const baseFontSize = 60 * 2;
+
 
 function $id(id) { return document.getElementById(id); }
 
@@ -18,7 +31,7 @@ Date.prototype.getWeek = function() {
     return 1 + Math.ceil((firstThursday - target) / (7 * 24 * 3600 * 1000));
 }
 
-function HighlightDays(days) {
+function highlightDays(days) {
     this.days = {}
     for (var i in days) {
         this.days[days[i]] = true;
@@ -32,6 +45,24 @@ function cweek(date) {
     return day;
 }
 
+function dayNameCell(text, className) {
+    var dv = new SVG.G();
+    dv.rect(wc, wc);
+
+    var t = dv.text(text)
+    t.move(wc / 2, 0);
+    t.font({
+        family:   fontFamily,
+        size:     baseFontSize / 2.75,
+        anchor:   'middle',
+        leading:  '3em'
+    });
+
+    dv.attr({ class: className });
+
+    return dv;
+}
+
 function dayCell(ctx, text, className) {
     var cr = 5;
     var dv = ctx.group();
@@ -43,7 +74,7 @@ function dayCell(ctx, text, className) {
             family:   fontFamily,
             size:     baseFontSize,
             anchor:   'middle',
-            leading:  '1.5em'
+            leading:  '1.4em'
         });
     }
 
@@ -59,14 +90,14 @@ function dayCell(ctx, text, className) {
 
 function sprintIdCell(ctx, date) {
     var sprintId = date.getWeek();
-    var sprintHalfId = Math.floor((sprintId/2)) - 1;
+    var sprintHalfId = Math.ceil((sprintId/2)) - 1;
     var sprintAlphaId = alpha[sprintHalfId];
 
     var cr = 5;
     var dv = ctx.group();
     dv.rect(wc, wc);
 
-    var t = dv.text(sprintId + '.' + sprintAlphaId);
+    var t = dv.text(sprintId + ' ' + sprintAlphaId);
     t.move(wc / 2, 0);
     t.font({
         family:   fontFamily,
@@ -80,16 +111,12 @@ function sprintIdCell(ctx, date) {
     return dv;
 }
 
-function renderMonth(ctx, year, month, highlightDays) {
-    var monthFullNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    var dayFullNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    var dayShortNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
-    var hlDays = (highlightDays) ? new HighlightDays(highlightDays) : null;
+function renderMonth(year, month, highlightDays) {
+    var hlDays = (highlightDays) ? new highlightDays(highlightDays) : null;
 
     var f = 6;
 
-    var table = ctx.group();
+    var table = new SVG.G();
     var yk = 0;
 
     var monthBlock = table.group();
@@ -111,9 +138,9 @@ function renderMonth(ctx, year, month, highlightDays) {
 
     for (var d = 0; d < 7; d++) {
         var className = 'day day-names' + ((d >= 5) ? ' day-holyday' : '');
-        var dv = dayCell(daysMatrix, dayFullNames[d], className);
+        var dv = dayNameCell(dayFullNames[d], className);
         dv.move(wc * d, yk * wc);
-        dv.get(1).font({ size: baseFontSize / 2.75, leading: '3em' });
+        daysMatrix.add(dv);
     }
 
     yk++;
@@ -126,7 +153,6 @@ function renderMonth(ctx, year, month, highlightDays) {
         var dv = dayCell(daysMatrix, null, 'day of-prev-month');
         dv.move(d * wc, yk * wc);
     }
-
 
     for (var d = 1; d < 32; d++) {
         date = new Date(month + '/' + d + '/' + year);
@@ -160,29 +186,23 @@ function renderMonth(ctx, year, month, highlightDays) {
         dv.move(wc * d, wc * yk);
     }
 
-    daysMatrix.move(wc, h - (yk + 2) * wc);
+    daysMatrix.move(wc, h - (yk + 1.5) * wc);
+
+    return table;
 }
 
-var alpha = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
 
 var svg = document.getElementsByTagName('svg')[0]
-
 var s = SVG(svg);
-
-var k = 10;
-
-var w = 210 * k;
-var h = 297 * k;
-
-var wc = w / 9;
-var baseFontSize = 60 * 2;
 
 s.viewbox(0, 0, w, h);
 
 var ctx = s.group();
 
-var image = ctx.image('image.jpg', w, 4 * wc);
-image.move(0, wc/2);
+var image = ctx.image('image.jpg', w, 5*wc);
+image.move(0, 0);
+image.attr({ preserveAspectRatio: 'xMaxYMid slice' });
 
 var currentDate = new Date();
-renderMonth(ctx, currentDate.getFullYear(), currentDate.getMonth() + 1);
+var month = renderMonth(currentDate.getFullYear(), currentDate.getMonth() + 1);
+ctx.add(month);

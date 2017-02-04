@@ -5,11 +5,14 @@
     margin: 0;
 }
 
-rect { fill: #fff; stroke: none; }
+rect {
+    fill: transparent;
+    stroke: none;
+}
 
 .month-name text { fill: #c00; }
 
-.day rect { fill: transparent; stroke: #f0f0f0; }
+.day rect { stroke: none; }
 .day circle { fill: transparent; }
 .day.day-holyday circle { fill: transparent; }
 .day text { fill: #333; }
