@@ -27,6 +27,14 @@ function renderNextMonth() {
     ctx.add(month);
 }
 
+function changeImage(event) {
+    let image = month.node.querySelector('image');
+    image.setAttribute('href', event.target.value);
+}
+
 let panel = document.querySelector('[data-behavior=control-panel]');
 panel.querySelector('[data-action=previous-month]').addEventListener('click', renderPreviousMonth);
 panel.querySelector('[data-action=next-month]').addEventListener('click', renderNextMonth);
+let imageInput = panel.querySelector('[data-input=image-url]');
+imageInput.addEventListener('keyup', changeImage);
+imageInput.addEventListener('change', changeImage);
