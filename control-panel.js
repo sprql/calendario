@@ -12,3 +12,21 @@ let ctx = s.group();
 let currentDate = new Date();
 let month = Calendario.renderMonth(currentDate.getFullYear(), currentDate.getMonth() + 1);
 ctx.add(month);
+
+function renderPreviousMonth() {
+    month.remove();
+    currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, currentDate.getDate());
+    month = Calendario.renderMonth(currentDate.getFullYear(), currentDate.getMonth() + 1);
+    ctx.add(month);
+}
+
+function renderNextMonth() {
+    month.remove();
+    currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, currentDate.getDate());
+    month = Calendario.renderMonth(currentDate.getFullYear(), currentDate.getMonth() + 1);
+    ctx.add(month);
+}
+
+let panel = document.querySelector('[data-behavior=control-panel]');
+panel.querySelector('[data-action=previous-month]').addEventListener('click', renderPreviousMonth);
+panel.querySelector('[data-action=next-month]').addEventListener('click', renderNextMonth);
