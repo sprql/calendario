@@ -38,7 +38,7 @@ window.Calendario = (function() {
         return (day == 0) ? 6 : day - 1;
     }
 
-    function dayNameCell(text, className) {
+    function dayNameCell(text) {
         let dv = new SVG.G();
         dv.rect(wc, wc);
 
@@ -50,15 +50,11 @@ window.Calendario = (function() {
             anchor:   'middle',
             leading:  '3em'
         });
-
-        dv.attr({ class: className });
-
         return dv;
     }
 
-    function dayCell(ctx, text, className) {
-        let cr = 5;
-        let dv = ctx.group();
+    function dayCell(text) {
+        let dv = new SVG.G();
         dv.rect(wc, wc);
         if (text) {
             let t = dv.text(text)
@@ -70,24 +66,15 @@ window.Calendario = (function() {
                 leading:  '1.4em'
             });
         }
-
-        dv.circle(cr).move(-cr/2, -cr/2);
-        dv.circle(cr).move(wc - cr/2, -cr/2);
-        dv.circle(cr).move(-cr/2, wc - cr/2);
-        dv.circle(cr).move(wc - cr/2, wc - cr/2);
-
-        dv.attr({ class: className });
-
         return dv;
     }
 
-    function sprintIdCell(ctx, date) {
+    function sprintIdCell(date) {
         let sprintId = getWeek(date);
         let sprintHalfId = Math.ceil((sprintId/2)) - 1;
         let sprintAlphaId = alpha[sprintHalfId];
 
-        let cr = 5;
-        let dv = ctx.group();
+        let dv = new SVG.G();
         dv.rect(wc, wc);
 
         let t = dv.text(sprintId + ' ' + sprintAlphaId);
@@ -127,25 +114,28 @@ window.Calendario = (function() {
 
         for (let d = 0; d < 7; d++) {
             let className = 'day day-names' + ((d >= 5) ? ' day-holyday' : '');
-            let dv = dayNameCell(dayFullNames[d], className);
+            let dv = dayNameCell(dayFullNames[d]);
+            dv.attr({ class: className });
             dv.move(wc * d, yk * wc);
             daysMatrix.add(dv);
         }
-
 
         let date = new Date(month + '/' + 1 + '/' + year);
         let firstWeekDayOfMonth = getWeekDay(date);
 
         if (firstWeekDayOfMonth > 0) {
             yk++;
-            let sprintCell = sprintIdCell(daysMatrix, date);
+            let sprintCell = sprintIdCell(date);
             sprintCell.move(-wc, wc * yk);
+            daysMatrix.add(sprintCell);
         }
 
         date.setDate(date.getDate() - firstWeekDayOfMonth);
         for (let d = 0; d < firstWeekDayOfMonth; d++) {
-            let dv = dayCell(daysMatrix, date.getDate().toString(), 'day of-prev-month');
+            let dv = dayCell(date.getDate().toString());
+            dv.attr({ class: 'day of-prev-month' });
             dv.move(d * wc, yk * wc);
+            daysMatrix.add(dv);
             date.setDate(date.getDate() + 1);
         }
 
@@ -153,14 +143,17 @@ window.Calendario = (function() {
             let weekDay = getWeekDay(date);
             if (weekDay == 0) {
                 yk++;
-                let sprintCell = sprintIdCell(daysMatrix, date);
+                let sprintCell = sprintIdCell(date);
                 sprintCell.move(-wc, wc * yk);
+                daysMatrix.add(sprintCell);
             }
 
             let className = 'day';
             if (weekDay > 4) { className += ' day-holyday'; }
-            let dv = dayCell(daysMatrix, d.toString(), className);
+            let dv = dayCell(d.toString());
+            dv.attr({ class: className });
             dv.move(wc * weekDay, wc * yk);
+            daysMatrix.add(dv);
 
             date.setDate(date.getDate() + 1);
             if ((date.getMonth() + 1) > month) {
@@ -173,8 +166,10 @@ window.Calendario = (function() {
             for (let d = lastWeekDayOfMonth; d < 7; d++) {
                 let className = 'day of-next-month';
                 if (d > 4) { className += ' day-holyday'; }
-                let dv = dayCell(daysMatrix, date.getDate().toString(), className);
+                let dv = dayCell(date.getDate().toString());
+                dv.attr({ class: className });
                 dv.move(wc * d, wc * yk);
+                daysMatrix.add(dv);
                 date.setDate(date.getDate() + 1);
             }
         }

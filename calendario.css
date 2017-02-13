@@ -18,12 +18,8 @@ rect {
 .month-name text { fill: #c00; }
 
 .day rect { stroke: none; }
-.day circle { fill: transparent; }
-.day.day-holyday circle { fill: transparent; }
 .day text { fill: #333; }
-.day-names circle { fill: transparent; }
 .day-names rect { stroke: none; }
-.day-names.day-holyday circle { fill: transparent; }
 .day.day-holyday text { fill: #c00; }
 .sprint-id text { fill: #ccc; }
 .day-names text { fill: #555; }
