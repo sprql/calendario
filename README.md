@@ -1,8 +1,10 @@
 # Calendario
 
-Printable calendar
+Awesome printable Wall calendar
 
 - Open https://sprql.github.io/calendario/
+- Define image url
+- Select mounth with previous/next buttons
 - Print
 - Enjoy!
 
